@@ -41,8 +41,11 @@ module Covered
 		def call(wrapper, output = $stdout, **options)
 			terminal = self.terminal(output)
 			complete_files = []
+			partial_files_count = 0
 			
 			statistics = self.each(wrapper) do |coverage|
+				partial_files_count += 1
+				
 				path = wrapper.relative_path(coverage.path)
 				terminal.puts ""
 				terminal.puts path, style: :path
@@ -66,8 +69,8 @@ module Covered
 			terminal.puts
 			statistics.print(output)
 			
-			# Show information about files with 100% coverage
-			if complete_files.any?
+			# Only show information about files with 100% coverage if there were files with partial coverage shown above
+			if complete_files.any? && partial_files_count > 0
 				terminal.puts ""
 				if complete_files.size == 1
 					terminal.puts "1 file has 100% coverage and is not shown above:"
